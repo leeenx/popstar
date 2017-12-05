@@ -31,6 +31,7 @@ html, body {
 	color: #fff; 
 	text-align: center; 
 	margin: 20px auto 80px; 
+	height: 24px; 
 }
 
 .popstar_btn, .popstar_btn:hover, .popstar_btn:visited {

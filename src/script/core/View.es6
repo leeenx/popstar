@@ -2,10 +2,38 @@ import '../lib/pixi.extension';
 
 export default class view {
 	constructor(view) { 
+		// 高宽比 
+		let ratiio = 375 / 603; 
+		// 当前高度与 ip6的高度比 
+		let ip6Ratio = 1; 
+		// 更新宽高比 
+		let updateRatio = () => {
+			// 浏览器的宽高
+			let cw = document.documentElement.clientWidth, ch = document.documentElement.clientHeight; 
+			// 横屏
+			if(cw > ch) {
+				[cw, ch] = [ch, cw]; 
+			}
+			let curRatio = ch / cw; 
+			if(curRatio !== ratiio) {
+				ratiio = curRatio; 
+				ip6Ratio = ch / 603; 
+				this.height = this.width * ratiio; 
+				this.app && app.renderer.resize(this.width, this.height); 
+			}
+		}
+		// 界面的宽高
+		this.width = 375; 
+		this.height = 603; 
+		// 按当前浏览器适配
+		updateRatio(); 
+		// 监听 resize 事件
+		window.addEventListener("resize", updateRatio); 
+
 		const app = new PIXI.Application(
 			{
-				width: 375, 
-				height: 603, 
+				width: this.width, 
+				height: this.height, 
 				resolution: 2, 
 				backgroundColor: 0x333333, 
 				view: view
@@ -36,9 +64,9 @@ export default class view {
 		// 游戏区域
 		this.area = new PIXI.Container(); 
 		let emptySprite = PIXI.Sprite.from(PIXI.Texture.EMPTY); 
-		emptySprite.set({width: 375, height: 375}); 
+		emptySprite.set({width: this.width, height: this.width}); 
 		this.area.addChild(emptySprite); 
-		this.area.set({x: .5, y: 228}); 
+		this.area.set({x: .5, y: this.height - this.width}); 
 
 		// 砖块尺寸
 		this.tileSize = 36.5; 
@@ -51,7 +79,7 @@ export default class view {
 		this.col = this.row = 10; 
 
 		// X轴中心点
-		this.centerX = this.area.width / 2; 
+		this.centerX = this.width / 2; 
 
 		// 游戏单独一个容器
 		this.game = new PIXI.Container(); 
@@ -173,7 +201,8 @@ export default class view {
 				anchorX: .5, 
 				anchorY: .5, 
 				x: this.centerX, 
-				top: 416, 
+				top: 410 * ip6Ratio, 
+				defaultTop: 410 * ip6Ratio, 
 				renderable: false
 			}
 		); 
@@ -208,7 +237,7 @@ export default class view {
 				anchorX: .5, 
 				anchorY: .5, 
 				x: this.centerX, 
-				top: 435, 
+				top: 435 * ip6Ratio, 
 				renderable: false
 			}
 		); 
@@ -229,7 +258,7 @@ export default class view {
 				anchorX: .5, 
 				anchorY: .5, 
 				x: this.centerX, 
-				top: 260
+				top: 260 * ip6Ratio
 			}
 		); 
 		this.levelInfo.goal = new PIXI.Text(
@@ -247,7 +276,7 @@ export default class view {
 				anchorX: .5, 
 				anchorY: .5, 
 				x: this.centerX, 
-				top: 290
+				top: 300 * ip6Ratio
 			}
 		); 
 
@@ -367,14 +396,14 @@ export default class view {
 				TweenMax.fromTo(
 					this.levelInfo, 
 					.6, 
-					{x: this.renderer.view.width}, 
+					{x: this.width}, 
 					{x: 0}
 				);
 				TweenMax.to(
 					this.levelInfo, 
 					.6, 
 					{
-						x: -this.renderer.view.width, 
+						x: -this.width, 
 						delay: 3, 
 						onComplete: () => { 
 							this.levelInfo.parent.removeChild(this.levelInfo);
@@ -385,7 +414,7 @@ export default class view {
 				TweenMax.fromTo(
 					this.levelInfo.goal, 
 					.6, 
-					{x: this.renderer.view.width}, 
+					{x: this.centerX + this.width}, 
 					{x: this.centerX, delay: .6}
 				); 
 				TweenMax.to(
@@ -651,7 +680,7 @@ export default class view {
 			.4, 
 			{
 				x: this.centerX, 
-				y: -158, 
+				y: 603 - this.height - 158, 
 				scaleX: .5, 
 				scaleY: .5, 
 				ease: Linear.easeNone, 
@@ -702,7 +731,7 @@ export default class view {
 		// 初始化奖励分数
 		this.bounty = 2000; 
 		// 位置重置
-		this.bountyLabel.top = 410; 
+		this.bountyLabel.top = this.bountyLabel.defaultTop; 
 		// area 闪一闪
 		return new Promise(
 			(resolve, reject) => {

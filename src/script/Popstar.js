@@ -8472,9 +8472,40 @@ var view = function () {
 
 		_classCallCheck(this, view);
 
+		// 高宽比 
+		var ratiio = 375 / 603;
+		// 当前高度与 ip6的高度比 
+		var ip6Ratio = 1;
+		// 更新宽高比 
+		var updateRatio = function updateRatio() {
+			// 浏览器的宽高
+			var cw = document.documentElement.clientWidth,
+			    ch = document.documentElement.clientHeight;
+			// 横屏
+			if (cw > ch) {
+				var _ref = [ch, cw];
+				cw = _ref[0];
+				ch = _ref[1];
+			}
+			var curRatio = ch / cw;
+			if (curRatio !== ratiio) {
+				ratiio = curRatio;
+				ip6Ratio = ch / 603;
+				_this.height = _this.width * ratiio;
+				_this.app && app.renderer.resize(_this.width, _this.height);
+			}
+		};
+		// 界面的宽高
+		this.width = 375;
+		this.height = 603;
+		// 按当前浏览器适配
+		updateRatio();
+		// 监听 resize 事件
+		window.addEventListener("resize", updateRatio);
+
 		var app = new PIXI.Application({
-			width: 375,
-			height: 603,
+			width: this.width,
+			height: this.height,
 			resolution: 2,
 			backgroundColor: 0x333333,
 			view: _view
@@ -8503,9 +8534,9 @@ var view = function () {
 		// 游戏区域
 		this.area = new PIXI.Container();
 		var emptySprite = PIXI.Sprite.from(PIXI.Texture.EMPTY);
-		emptySprite.set({ width: 375, height: 375 });
+		emptySprite.set({ width: this.width, height: this.width });
 		this.area.addChild(emptySprite);
-		this.area.set({ x: .5, y: 228 });
+		this.area.set({ x: .5, y: this.height - this.width });
 
 		// 砖块尺寸
 		this.tileSize = 36.5;
@@ -8518,7 +8549,7 @@ var view = function () {
 		this.col = this.row = 10;
 
 		// X轴中心点
-		this.centerX = this.area.width / 2;
+		this.centerX = this.width / 2;
 
 		// 游戏单独一个容器
 		this.game = new PIXI.Container();
@@ -8618,7 +8649,8 @@ var view = function () {
 			anchorX: .5,
 			anchorY: .5,
 			x: this.centerX,
-			top: 416,
+			top: 410 * ip6Ratio,
+			defaultTop: 410 * ip6Ratio,
 			renderable: false
 		});
 
@@ -8646,7 +8678,7 @@ var view = function () {
 			anchorX: .5,
 			anchorY: .5,
 			x: this.centerX,
-			top: 435,
+			top: 435 * ip6Ratio,
 			renderable: false
 		});
 
@@ -8662,7 +8694,7 @@ var view = function () {
 			anchorX: .5,
 			anchorY: .5,
 			x: this.centerX,
-			top: 260
+			top: 260 * ip6Ratio
 		});
 		this.levelInfo.goal = new PIXI.Text("目标分数 xxxx", {
 			fontFamily: "Arial",
@@ -8675,7 +8707,7 @@ var view = function () {
 			anchorX: .5,
 			anchorY: .5,
 			x: this.centerX,
-			top: 290
+			top: 300 * ip6Ratio
 		});
 
 		this.levelInfo.addChild(this.levelInfo.title, this.levelInfo.goal);
@@ -8768,16 +8800,16 @@ var view = function () {
 			this.game.addChild(this.levelInfo);
 			return new Promise(function (resolve, reject) {
 				// 显示当前关卡信息 
-				TweenMax.fromTo(_this3.levelInfo, .6, { x: _this3.renderer.view.width }, { x: 0 });
+				TweenMax.fromTo(_this3.levelInfo, .6, { x: _this3.width }, { x: 0 });
 				TweenMax.to(_this3.levelInfo, .6, {
-					x: -_this3.renderer.view.width,
+					x: -_this3.width,
 					delay: 3,
 					onComplete: function onComplete() {
 						_this3.levelInfo.parent.removeChild(_this3.levelInfo);
 						resolve();
 					}
 				});
-				TweenMax.fromTo(_this3.levelInfo.goal, .6, { x: _this3.renderer.view.width }, { x: _this3.centerX, delay: .6 });
+				TweenMax.fromTo(_this3.levelInfo.goal, .6, { x: _this3.centerX + _this3.width }, { x: _this3.centerX, delay: .6 });
 				TweenMax.to(_this3.goal, .15, {
 					alpha: 0,
 					delay: 1.2,
@@ -8860,12 +8892,12 @@ var view = function () {
 
 	}, {
 		key: "update",
-		value: function update(_ref) {
-			var originIndex = _ref.originIndex,
-			    index = _ref.index,
-			    clr = _ref.clr,
-			    removed = _ref.removed,
-			    score = _ref.score;
+		value: function update(_ref2) {
+			var originIndex = _ref2.originIndex,
+			    index = _ref2.index,
+			    clr = _ref2.clr,
+			    removed = _ref2.removed,
+			    score = _ref2.score;
 
 			// 还没有 id 或没有色值，直接不处理
 			if (originIndex === undefined || clr === undefined) return;
@@ -9055,7 +9087,7 @@ var view = function () {
 			});
 			TweenMax.to(score, .4, {
 				x: this.centerX,
-				y: -158,
+				y: 603 - this.height - 158,
 				scaleX: .5,
 				scaleY: .5,
 				ease: Linear.easeNone,
@@ -9114,7 +9146,7 @@ var view = function () {
 			// 初始化奖励分数
 			this.bounty = 2000;
 			// 位置重置
-			this.bountyLabel.top = 410;
+			this.bountyLabel.top = this.bountyLabel.defaultTop;
 			// area 闪一闪
 			return new Promise(function (resolve, reject) {
 				TweenMax.fromTo(_this7.area, .1, {

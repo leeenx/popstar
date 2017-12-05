@@ -1,0 +1,102 @@
+html, body {
+	margin: 0 auto; 
+	padding: 0; 
+	max-width: 540px; 
+}
+
+.popstar {
+	position: relative; 
+	width: 100%; 
+	height: auto; 
+}
+
+.popstar_menu {
+	position: absolute; 
+	top: 0;
+	left: 0; 
+	width: 100%; 
+	height: 100%; 
+	overflow: hidden; 
+	transform: translate3d(0, 0, 0);
+	transition: transform .3s ease;
+}
+
+.popstar_menu.hide {
+	transform: translate3d(-100%, 0, 0);
+}
+
+.popstar_high_score {
+	font-size: 16px; 
+	color: #fff; 
+	text-align: center; 
+	margin: 20px auto 80px; 
+}
+
+.popstar_btn, .popstar_btn:hover, .popstar_btn:visited {
+	display: block; 
+	width: 250px; 
+	height: 40px; 
+	line-height: 40px; 
+	color: #fff; 
+	font-size: 20px; 
+	text-align: center; 
+	text-decoration: none; 
+	margin: 15px auto;
+	border-radius: 20px; 
+	background-color: #6190e8; 
+	text-shadow: 2px 2px 5px #000; 
+	box-shadow: inset -2px -2px 8px rgba(255, 255, 255, .3); 
+}
+
+.popstar_btn.disabled, .popstar_btn.disabled:hover, .popstar_btn.disabled:visited {
+	opacity: .8; 
+}
+
+.popstar_ad {
+	position: fixed; 
+	width: 300px; 
+	height: auto; 
+	top: 50%; 
+	left: 50%; 
+	transform: translate(-50%, -50%); 
+	display: none; 
+}
+
+.popstar_ad img {
+	display: block; 
+	width: 100%; 
+	margin: auto; 
+}
+
+.popstar_ad_close {
+	position: absolute; 
+	width: 24px; 
+	height: 24px; 
+	background-color: rgba(0, 0, 0, .5); 
+	top: -12px; 
+	right: -12px; 
+	border-radius: 100%; 
+	border: 1px solid rgba(255, 255, 255, 1);
+}
+
+.popstar_ad_close::before, .popstar_ad_close::after {
+	content: ''; 
+	position: absolute; 
+	width: 16px; 
+	height: 1px; 
+	left: 4px; 
+	top: 11px; 
+	background-color: #fff; 
+	transform: rotateZ(45deg);
+}
+
+.popstar_ad_close::after {
+	transform: rotateZ(-45deg);
+}
+
+
+
+
+
+
+

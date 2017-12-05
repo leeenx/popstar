@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>H5小游戏100例: 消除星星</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no" />
+  <link href="css/popstar.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="wrapper">
+		<canvas class="popstar"></canvas>
+		<!-- 用户界面 -->
+		<div class="popstar_menu" id="menu">
+			<div class="popstar_high_score" id="highScore"></div>
+			<a class="popstar_btn" href="javascript:;" id="newGame">新 游 戏</a>
+			<a class="popstar_btn disabled" href="javascript:;" id="resumeGame">继续游戏</a>
+			<a class="popstar_btn" href="https://zhuanlan.zhihu.com/snsgame?group_id=909745245186072576" target="_blank">关注我们</a>
+			<a class="popstar_btn" href="https://aotu.io/" target="_blank">凹凸官网</a>
+		</div>
+		<!-- 暂停时的广告 -->
+		<div class="popstar_ad" id="popstarAd">
+			<a href="//jd.com"><img src="images/ad@2x.jpg" /></a>
+			<div class="popstar_ad_close" id="popstarAdClose"></div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="script/lib/pixi.js"></script>
+<script type="text/javascript" src="script/lib/gsap/TweenMax.js"></script>
+<script type="text/javascript" src="script/Popstar.js"></script>
+<script type="text/javascript">
+PIXI.utils.skipHello(); 
+
+// 用户界面不属于游戏部分，直接在这里实现
+var record; 
+
+// 初始化用户界面
+var initUI = function() { 
+	// 获取 localStorage 信息
+	record = JSON.parse(localStorage.getItem("popstar-record")) || {total: 0, level: 0, highScore: 0}
+	highScore.innerHTML = "最高分：" + record.highScore; 
+	resumeGame.className = record.level > 0 ? "popstar_btn" : "popstar_btn disabled"; 
+}
+
+initUI(); 
+
+// 初始化游戏 
+var popstar = new Popstar(
+	{
+		view: document.querySelector(".popstar"), 
+		// 当前总分数
+		total: record.total
+	}
+); 
+
+// 新游戏 
+newGame.addEventListener("ontouchstart" in document ? "touchend" : "click", function() { 
+	// 记录分数置 0
+	record.total = record.level = 0; 
+	// 记录到 localStorage
+	localStorage.setItem("popstar-record", JSON.stringify(record)); 
+	menu.className = "popstar_menu hide"; 
+	setTimeout(function() {
+		popstar.enter(0); 
+	}, 300); 
+}); 
+
+// 继续游戏
+resumeGame.addEventListener("ontouchstart" in document ? "touchend" : "click", function() { 
+	if(record.level < 1) return; 
+	menu.className = "popstar_menu hide"; 
+	setTimeout(function() {
+		popstar.enter(record.level); 
+	}, 300); 
+}); 
+
+// 关闭广告
+popstarAdClose.addEventListener("ontouchstart" in document ? "touchend" : "click", function() { 
+	popstar.resume(); 
+	popstarAd.style.display = "none"; 
+}); 
+
+// 用户按下暂停按钮
+popstar.event.on("pause", function() { 
+	popstar.pause(); 
+	popstarAd.style.display = "block"; 
+}); 
+
+// 用户按下恢复按钮
+popstar.event.on("resume", function() { 
+	popstar.resume(); 
+	popstarAd.style.display = "none"; 
+}); 
+
+// 通关
+popstar.event.on("pass", function() { 
+	// 记录当前的得分 
+	record.total = popstar.total; 
+	// 记录最高分
+	record.highScore = Math.max(record.highScore, record.total); 
+	// 下一关
+	popstar.next(); 
+	// 记录最新关卡 
+	record.level = popstar.level; 
+	// 记录到 localStorage
+	localStorage.setItem("popstar-record", JSON.stringify(record)); 
+}); 
+
+// 游戏结束
+popstar.event.on("gameover", function() { 
+	// 把关卡信息重置为 0
+	record.level = 0; 
+	// 记录最高分
+	record.highScore = Math.max(record.highScore, popstar.total); 
+	// 记录到 localStorage
+	localStorage.setItem("popstar-record", JSON.stringify(record)); 
+	alert("游戏结束"); 
+	popstar.destroy(); 
+	menu.className = "popstar_menu"; 
+	// 重置信息
+	initUI(); 
+}); 
+
+</script>
+</html>
+
+

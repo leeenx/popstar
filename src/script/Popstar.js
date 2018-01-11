@@ -7872,6 +7872,10 @@ var _shuffle = require('../lib/shuffle.es6');
 
 var _shuffle2 = _interopRequireDefault(_shuffle);
 
+var _waveaverage = require('../lib/waveaverage.es6');
+
+var _waveaverage2 = _interopRequireDefault(_waveaverage);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -7943,17 +7947,14 @@ var Model = function () {
 		value: function init() {
 			var _this = this;
 
-			/*
-   	@ 砖块随机颜色: 5种颜色是 8 ~ 22，最后一种 = 100 - 前四种的总数
-   */
-			// 色砖计数
-			var count = 0;
-			// 打散颜色后随机计算
-			(0, _shuffle2.default)([0, 1, 2, 3, 4]).forEach(function (clr, index) {
+			// 色砖小计数
+			var subtotal = 0;
+			// 波动均分色块
+			(0, _waveaverage2.default)(5, 4, 4).forEach(function (count, clr) {
+				count += 20;
 				// 色砖数量 
-				var len = index !== 4 ? Math.random() * 4 + 18 >> 0 : _this.gridCellCount - count;
-				while (0 < len--) {
-					var tile = _this.tiles[count++];
+				while (0 < count--) {
+					var tile = _this.tiles[subtotal++];
 					// 删除 originIndex ---- 提前删除可以提升性能
 					delete tile.originIndex;
 					tile.clr = clr;
@@ -8385,17 +8386,6 @@ var Model = function () {
 
 			// 清空 updatedColSet
 			this.updatedColSet.clear();
-
-			// // 绘制数组
-			// var str = ""; 
-			// for(let i = 0; i < this.gridCellCount; ++i) { 
-			// 	let tile = this.grid[i]; 
-			// 	str += '<span class="clr_' + (tile === undefined ? "" : tile.clr) + '"></span>'; 
-			// 	if(i % this.col === this.col - 1) {
-			// 		str += '<br />';
-			// 	}
-			// }
-			// arr.innerHTML = str; 
 		}
 		/*
   	@ 检查是否死局
@@ -8453,7 +8443,7 @@ var Model = function () {
 
 exports.default = Model;
 
-},{"../lib/shuffle.es6":332}],329:[function(require,module,exports){
+},{"../lib/shuffle.es6":332,"../lib/waveaverage.es6":334}],329:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9785,5 +9775,65 @@ var timer = new Timer();
 timer.useRAF = true;
 // 导出timer
 exports.default = timer;
+
+},{}],334:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = waveaverage;
+// 快速波动均分算法
+function waveaverage() {
+	var n = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 5;
+	var crest = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
+	var trough = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
+	var isInteger = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
+	// 平均结果
+	var list = [];
+	// 无法进行波动均分，直接返回完全平分
+	if (crest > (n - 1) * trough || trough > (n - 1) * crest) {
+		return new Array(n).fill(0);
+	}
+	// 最少需要消除的高度
+	var base = 0;
+	// 波动量
+	var wave = 0;
+	// 高位
+	var high = crest;
+	// 低位
+	var low = -trough;
+	// 累计量 
+	var sum = 0;
+	// 剩余数量 
+	var count = n;
+
+	while (--count >= 0) {
+		// 获取当前的波动量
+		if (crest > count * trough - sum) {
+			high = count * trough - sum;
+		}
+		if (trough > count * crest + sum) {
+			low = -sum - count * crest;
+		}
+		base = low;
+		wave = high - low;
+		// 随机波动量 
+		var rnd = void 0;
+		if (count > 0) {
+			// 随机波动
+			rnd = base + Math.random() * (wave + 1);
+		} else {
+			rnd = -sum;
+		}
+		if (isInteger === true) {
+			rnd = Math.floor(rnd);
+		}
+		sum += rnd;
+		list.push(rnd);
+	}
+	return list;
+}
 
 },{}]},{},[326]);

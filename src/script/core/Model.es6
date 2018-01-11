@@ -4,6 +4,7 @@
 */
 
 import shuffle from '../lib/shuffle.es6'; 
+import waveaverage from '../lib/waveaverage.es6'; 
 
 export default class Model {
 	constructor() { 
@@ -62,24 +63,21 @@ export default class Model {
 	}
 	// 填充数组 ---- count 表示几种颜色
 	init() { 
-		/*
-			@ 砖块随机颜色: 5种颜色是 8 ~ 22，最后一种 = 100 - 前四种的总数
-		*/
-		// 色砖计数
-		let count = 0; 
-		// 打散颜色后随机计算
-		shuffle([0, 1, 2, 3, 4]).forEach(
-			(clr, index) => {
+		// 色砖小计数
+		let subtotal = 0; 
+		// 波动均分色块
+		waveaverage(5, 4, 4).forEach(
+			(count, clr) => { 
+				count += 20; 
 				// 色砖数量 
-				let len = index !== 4 ? Math.random() * 4 + 18 >> 0 : this.gridCellCount - count; 
-				while(0 < len--) {
-					let tile = this.tiles[count++]; 
+				while(0 < count--) {
+					let tile = this.tiles[subtotal++]; 
 					// 删除 originIndex ---- 提前删除可以提升性能
 					delete tile.originIndex; 
 					tile.clr = clr; 
 				}
 			}
-		); 
+		);
 
 		// 打散 tiles
 		shuffle(this.tiles); 
@@ -433,16 +431,6 @@ export default class Model {
 		// 清空 updatedColSet
 		this.updatedColSet.clear(); 
 
-		// // 绘制数组
-		// var str = ""; 
-		// for(let i = 0; i < this.gridCellCount; ++i) { 
-		// 	let tile = this.grid[i]; 
-		// 	str += '<span class="clr_' + (tile === undefined ? "" : tile.clr) + '"></span>'; 
-		// 	if(i % this.col === this.col - 1) {
-		// 		str += '<br />';
-		// 	}
-		// }
-		// arr.innerHTML = str; 
 	}
 	/*
 		@ 检查是否死局

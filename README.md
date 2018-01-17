@@ -46,7 +46,7 @@
 
 笔者这次又是使用了 MVC 模式来写「消灭星星」。星星「砖块」的数据结构与各种状态由 Model 实现，游戏的核心在 Model 中完成；View 映射 Model 的变化并做出对应的行为，它的任务主要是展示动画；用户与游戏的交互由 Control 完成。
 
-从逻辑规划上，Model 很重，View 与 Control 很轻。不过，从代码量上看，View 很重，而 Model 与 Control 相对很轻。
+从逻辑规划上看，Model 很重而View 与 Control 很轻，不过，从代码量上看，View 很重而 Model 与 Control 相对很轻。
 
 
 ## 1. Model 

@@ -315,7 +315,7 @@ Control 要处理的事务比较多，如下：
 初始化时，Control 把 Model 的砖块单向绑定到 View 的砖块了。如下：
 
 ```javascript
-Object.defineProperties(model.tile, {
+Object.defineProperties(model.tile, 
 	{
 		originIndex: {
 			get: () => {...}, 
@@ -353,7 +353,7 @@ Object.defineProperties(model.tile, {
 			}
 		}, 
 	}
-}); 
+); 
 ``` 
 
 「通关分值」与「判断通关条件」这对逻辑在本文的「游戏规则」中有相关介绍，这里不再赘述。

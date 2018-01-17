@@ -11,7 +11,7 @@ export default class Model {
 		// 行列数 - 固定
 		this.row = this.col = 10; 
 		/* 
-			@ 列信息 - 因为砖块是向下沉的 
+			@ 墙体信息 - 因为砖块是向下沉的 
 			@ count - 列砖块数
 			@ start - 顶部行索引
 			@ end - 底部行索引(好像没什么意思，因为它是个固定值)
@@ -20,9 +20,9 @@ export default class Model {
 			@ bottomPit - 最底部的坑
 			@ 如果 pitCount > 0 && bottomPit - topPit + 1 === pitCount 表示坑位是连续的 
 		*/
-		this.colInfoSet = new Array(this.col); 
+		this.wall = new Array(this.col); 
 		for(let i = 0; i < this.col; ++i) {
-			this.colInfoSet[i] = {
+			this.wall[i] = {
 				count: this.row, 
 				start: 0, 
 				end: this.row - 1, 
@@ -100,7 +100,7 @@ export default class Model {
 
 		// 生成新的列信息
 		for(let i = 0; i < this.col; ++i) {
-			this.colInfoSet[i] = {
+			this.wall[i] = {
 				count: this.row, 
 				start: 0, 
 				end: this.row - 1, 
@@ -120,7 +120,7 @@ export default class Model {
 		// 上节点索引
 		let topIndex = index - this.col; 
 		// 上边界「行」索引
-		let topBoundary = this.colInfoSet[colIndex].start; 
+		let topBoundary = this.wall[colIndex].start; 
 		// 在最顶部
 		if(rowIndex === topBoundary) return false; 
 		// 非最顶部
@@ -137,7 +137,7 @@ export default class Model {
 		// 右节点索引
 		let rightIndex = index + 1; 
 		// 右边界「列」索引 
-		let rightBoundary = this.colInfoSet.length - 1; 
+		let rightBoundary = this.wall.length - 1; 
 		// 在最右部
 		if(colIndex === rightBoundary) return false; 
 		// 非最右部
@@ -154,7 +154,7 @@ export default class Model {
 		// 下节点索引
 		let bottomIndex = index + this.col; 
 		// 下边界「行」索引
-		let bottomBoundary = this.colInfoSet[colIndex].end; 
+		let bottomBoundary = this.wall[colIndex].end; 
 		// 在最底部
 		if(rowIndex === bottomBoundary) return false; 
 		// 非最底部
@@ -254,7 +254,7 @@ export default class Model {
 				sameClrTiles = nextSameClrTiles; 
 			} 
 			// 夯实数组
-			// this.compress(); 
+			// this.tamp(); 
 			return count; 
 		}
 	}
@@ -262,8 +262,8 @@ export default class Model {
 	cleanAll() { 
 		// 减分倍数
 		let count = 0; 
-		for(let col = 0, len = this.colInfoSet.length;  col < len; ++col) { 
-			let colInfo = this.colInfoSet[col]; 
+		for(let col = 0, len = this.wall.length;  col < len; ++col) { 
+			let colInfo = this.wall[col]; 
 			for(let row = colInfo.start; row <= colInfo.end; ++row) {
 				let tile = this.grid[row * this.col + col]; 
 				tile.score = -20 - 40 * count++; 
@@ -274,7 +274,7 @@ export default class Model {
 	// 更新列信息
 	updateColInfo(index, rowIndex, colIndex) { 
 		this.updatedColSet.has(colIndex) || this.updatedColSet.add(colIndex); 
-		let colInfo = this.colInfoSet[colIndex]; 
+		let colInfo = this.wall[colIndex]; 
 		// 当前列砖块数量减1
 		--colInfo.count;
 		// 列的空洞数加1
@@ -287,13 +287,13 @@ export default class Model {
 		--this.tileCount; 
 	}
 	// 夯实数组
-	compress() { 
+	tamp() { 
 		// 空列数 
 		let emptyCol = []; 
 		// 空列的最小与最大索引
 		let min = this.col, max = -1;
 		for(let colIndex of this.updatedColSet) { 
-			let colInfo = this.colInfoSet[colIndex]; 
+			let colInfo = this.wall[colIndex]; 
 			let {start, end, pitCount, topPit, bottomPit, count} = colInfo; 
 
 			// 垂直方法压缩 
@@ -362,7 +362,7 @@ export default class Model {
 		// 空列总数
 		let emptyColCount = emptyCol.length; 
 		// 当前列数
-		let colCount = this.colInfoSet.length; 
+		let colCount = this.wall.length; 
 		// 有空列，水平方向压缩 
 		if(emptyColCount > 0) { 
 			// 连续的空列
@@ -370,7 +370,7 @@ export default class Model {
 				// 空列不处在最右边 - 空列在最右边表示已经是压缩状态，删除最右边的空列信息
 				if(max !== colCount - 1) {
 					for(let i = max + 1; i < colCount; ++i) {
-						let colInfo = this.colInfoSet[i]; 
+						let colInfo = this.wall[i]; 
 						let {start, end} = colInfo; 
 						// 压缩
 						for(let j = start; j <= end; ++j) { 
@@ -384,9 +384,9 @@ export default class Model {
 							// 更新索引
 							tile.index = indexB; 
 						}
-						// colInfoSet 信息更新
-						this.colInfoSet[i - emptyColCount] = colInfo; 
-						delete this.colInfoSet[i]; 
+						// wall 信息更新
+						this.wall[i - emptyColCount] = colInfo; 
+						delete this.wall[i]; 
 					}
 				} 
 			}
@@ -395,7 +395,7 @@ export default class Model {
 				// 最左边的空列 - 压缩过程会变化
 				let leftEmptyColIndex = min; 
 				for(let i = min + 1; i < colCount; ++i) {
-					let colInfo = this.colInfoSet[i]; 
+					let colInfo = this.wall[i]; 
 					let {start, end, count} = colInfo; 
 					// 当前列到最左边空列的距离
 					let distance = i - leftEmptyColIndex; 
@@ -413,9 +413,9 @@ export default class Model {
 							tile.index = indexB; 
 						}
 
-						// colInfoSet 信息更新
-						this.colInfoSet[leftEmptyColIndex] = colInfo; 
-						delete this.colInfoSet[i]; 
+						// wall 信息更新
+						this.wall[leftEmptyColIndex] = colInfo; 
+						delete this.wall[i]; 
 
 						// 最左边的空理右移一列
 						++leftEmptyColIndex; 
@@ -424,7 +424,7 @@ export default class Model {
 			}
 
 			// 删除最右边的空列
-			this.colInfoSet.splice(colCount - emptyColCount, emptyColCount); 
+			this.wall.splice(colCount - emptyColCount, emptyColCount); 
 
 		}
 
@@ -440,14 +440,14 @@ export default class Model {
 	check() { 
 		if(this.tileCount === 0) return false;
 		// 取一个随机「列」样本
-		let patternCol = Math.random() * this.colInfoSet.length >> 0; 
-		let {start, end} = this.colInfoSet[patternCol]; 
+		let patternCol = Math.random() * this.wall.length >> 0; 
+		let {start, end} = this.wall[patternCol]; 
 		// 取一个随机「行」样式
 		let patternRow = Math.random() * (end - start + 1) + start >> 0; 
 
 		// 向左扫描「列」
 		for(let col = patternCol; col >=0; --col) { 
-			let colInfo = this.colInfoSet[col]; 
+			let colInfo = this.wall[col]; 
 			// 行索引 
 			let rowIndex = (patternCol === col ? patternRow : colInfo.start); 
 			// 向下扫描「行」
@@ -460,8 +460,8 @@ export default class Model {
 			}
 		}
 		// 向右扫描「列」
-		for(let col = patternCol, len = this.colInfoSet.length; col < len; ++col) {
-			let colInfo = this.colInfoSet[col]; 
+		for(let col = patternCol, len = this.wall.length; col < len; ++col) {
+			let colInfo = this.wall[col]; 
 			// 行索引 
 			let rowIndex = (patternCol === col ? patternRow - 1 : colInfo.end); 
 			// 向上扫描「行」

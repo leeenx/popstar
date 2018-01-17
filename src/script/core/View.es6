@@ -490,7 +490,7 @@ export default class view {
 
 	// 更新砖块
 	update({originIndex, index, clr, removed, score}) { 
-		// 还没有 id 或没有色值，直接不处理
+		// 还没有 originIndex 或没有色值，直接不处理
 		if(originIndex === undefined || clr === undefined) return ; 
 		let tile = this.tiles[originIndex]; 
 		// tile 不存在，生成对应砖块

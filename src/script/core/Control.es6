@@ -42,35 +42,35 @@ export default class Constrol {
 		)
 
 		// 数据绑定: model.tiles -> view.tiles
-		model.tiles.forEach(cell => {
-			Reflect.defineProperty(cell, "index", {
+		model.tiles.forEach(tile => {
+			Reflect.defineProperty(tile, "index", {
 				set: value => { 
-					if(value === cell._index) return false; 
-					Reflect.set(cell, "_index", value); 
+					if(value === tile._index) return false; 
+					Reflect.set(tile, "_index", value); 
 					// 与view同步数据
-					view.update(cell); 
+					view.update(tile); 
 				}, 
-				get: () => Reflect.get(cell, "_index")
+				get: () => Reflect.get(tile, "_index")
 			}); 
 
-			Reflect.defineProperty(cell, "clr", {
+			Reflect.defineProperty(tile, "clr", {
 				set: value => { 
-					if(value === cell._clr) return false; 
-					Reflect.set(cell, "_clr", value); 
+					if(value === tile._clr) return false; 
+					Reflect.set(tile, "_clr", value); 
 					// 与view同步数据
-					view.update(cell); 
+					view.update(tile); 
 				}, 
-				get: () => Reflect.get(cell, "_clr")
+				get: () => Reflect.get(tile, "_clr")
 			}); 
 
-			Reflect.defineProperty(cell, "removed", { 
+			Reflect.defineProperty(tile, "removed", { 
 				set: value => { 
-					if(value === cell._removed) return false; 
-					Reflect.set(cell, "_removed", value); 
+					if(value === tile._removed) return false; 
+					Reflect.set(tile, "_removed", value); 
 					// 与view同步数据
-					view.update(cell); 
+					view.update(tile); 
 				}, 
-				get: () => Reflect.get(cell, "_removed") || false
+				get: () => Reflect.get(tile, "_removed") || false
 			}); 
 
 		}); 

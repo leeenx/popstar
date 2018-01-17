@@ -7889,7 +7889,7 @@ var Model = function () {
 		// 行列数 - 固定
 		this.row = this.col = 10;
 		/* 
-  	@ 列信息 - 因为砖块是向下沉的 
+  	@ 墙体信息 - 因为砖块是向下沉的 
   	@ count - 列砖块数
   	@ start - 顶部行索引
   	@ end - 底部行索引(好像没什么意思，因为它是个固定值)
@@ -7898,9 +7898,9 @@ var Model = function () {
   	@ bottomPit - 最底部的坑
   	@ 如果 pitCount > 0 && bottomPit - topPit + 1 === pitCount 表示坑位是连续的 
   */
-		this.colInfoSet = new Array(this.col);
+		this.wall = new Array(this.col);
 		for (var i = 0; i < this.col; ++i) {
-			this.colInfoSet[i] = {
+			this.wall[i] = {
 				count: this.row,
 				start: 0,
 				end: this.row - 1,
@@ -7980,7 +7980,7 @@ var Model = function () {
 
 			// 生成新的列信息
 			for (var i = 0; i < this.col; ++i) {
-				this.colInfoSet[i] = {
+				this.wall[i] = {
 					count: this.row,
 					start: 0,
 					end: this.row - 1,
@@ -8003,7 +8003,7 @@ var Model = function () {
 			// 上节点索引
 			var topIndex = index - this.col;
 			// 上边界「行」索引
-			var topBoundary = this.colInfoSet[colIndex].start;
+			var topBoundary = this.wall[colIndex].start;
 			// 在最顶部
 			if (rowIndex === topBoundary) return false;
 			// 非最顶部
@@ -8023,7 +8023,7 @@ var Model = function () {
 			// 右节点索引
 			var rightIndex = index + 1;
 			// 右边界「列」索引 
-			var rightBoundary = this.colInfoSet.length - 1;
+			var rightBoundary = this.wall.length - 1;
 			// 在最右部
 			if (colIndex === rightBoundary) return false;
 			// 非最右部
@@ -8043,7 +8043,7 @@ var Model = function () {
 			// 下节点索引
 			var bottomIndex = index + this.col;
 			// 下边界「行」索引
-			var bottomBoundary = this.colInfoSet[colIndex].end;
+			var bottomBoundary = this.wall[colIndex].end;
 			// 在最底部
 			if (rowIndex === bottomBoundary) return false;
 			// 非最底部
@@ -8179,8 +8179,8 @@ var Model = function () {
 		value: function cleanAll() {
 			// 减分倍数
 			var count = 0;
-			for (var col = 0, len = this.colInfoSet.length; col < len; ++col) {
-				var colInfo = this.colInfoSet[col];
+			for (var col = 0, len = this.wall.length; col < len; ++col) {
+				var colInfo = this.wall[col];
 				for (var row = colInfo.start; row <= colInfo.end; ++row) {
 					var tile = this.grid[row * this.col + col];
 					tile.score = -20 - 40 * count++;
@@ -8194,7 +8194,7 @@ var Model = function () {
 		key: 'updateColInfo',
 		value: function updateColInfo(index, rowIndex, colIndex) {
 			this.updatedColSet.has(colIndex) || this.updatedColSet.add(colIndex);
-			var colInfo = this.colInfoSet[colIndex];
+			var colInfo = this.wall[colIndex];
 			// 当前列砖块数量减1
 			--colInfo.count;
 			// 列的空洞数加1
@@ -8224,7 +8224,7 @@ var Model = function () {
 				for (var _iterator = this.updatedColSet[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 					var colIndex = _step.value;
 
-					var _colInfo2 = this.colInfoSet[colIndex];
+					var _colInfo2 = this.wall[colIndex];
 					var start = _colInfo2.start,
 					    end = _colInfo2.end,
 					    pitCount = _colInfo2.pitCount,
@@ -8314,7 +8314,7 @@ var Model = function () {
 
 			var emptyColCount = emptyCol.length;
 			// 当前列数
-			var colCount = this.colInfoSet.length;
+			var colCount = this.wall.length;
 			// 有空列，水平方向压缩 
 			if (emptyColCount > 0) {
 				// 连续的空列
@@ -8322,7 +8322,7 @@ var Model = function () {
 					// 空列不处在最右边 - 空列在最右边表示已经是压缩状态，删除最右边的空列信息
 					if (max !== colCount - 1) {
 						for (var i = max + 1; i < colCount; ++i) {
-							var colInfo = this.colInfoSet[i];
+							var colInfo = this.wall[i];
 							var start = colInfo.start,
 							    end = colInfo.end;
 							// 压缩
@@ -8338,9 +8338,9 @@ var Model = function () {
 								// 更新索引
 								tile.index = indexB;
 							}
-							// colInfoSet 信息更新
-							this.colInfoSet[i - emptyColCount] = colInfo;
-							delete this.colInfoSet[i];
+							// wall 信息更新
+							this.wall[i - emptyColCount] = colInfo;
+							delete this.wall[i];
 						}
 					}
 				}
@@ -8349,7 +8349,7 @@ var Model = function () {
 						// 最左边的空列 - 压缩过程会变化
 						var leftEmptyColIndex = min;
 						for (var _i2 = min + 1; _i2 < colCount; ++_i2) {
-							var _colInfo = this.colInfoSet[_i2];
+							var _colInfo = this.wall[_i2];
 							var start = _colInfo.start,
 							    end = _colInfo.end,
 							    count = _colInfo.count;
@@ -8370,9 +8370,9 @@ var Model = function () {
 									_tile.index = _indexB;
 								}
 
-								// colInfoSet 信息更新
-								this.colInfoSet[leftEmptyColIndex] = _colInfo;
-								delete this.colInfoSet[_i2];
+								// wall 信息更新
+								this.wall[leftEmptyColIndex] = _colInfo;
+								delete this.wall[_i2];
 
 								// 最左边的空理右移一列
 								++leftEmptyColIndex;
@@ -8381,7 +8381,7 @@ var Model = function () {
 					}
 
 				// 删除最右边的空列
-				this.colInfoSet.splice(colCount - emptyColCount, emptyColCount);
+				this.wall.splice(colCount - emptyColCount, emptyColCount);
 			}
 
 			// 清空 updatedColSet
@@ -8398,17 +8398,17 @@ var Model = function () {
 		value: function check() {
 			if (this.tileCount === 0) return false;
 			// 取一个随机「列」样本
-			var patternCol = Math.random() * this.colInfoSet.length >> 0;
-			var _colInfoSet$patternCo = this.colInfoSet[patternCol],
-			    start = _colInfoSet$patternCo.start,
-			    end = _colInfoSet$patternCo.end;
+			var patternCol = Math.random() * this.wall.length >> 0;
+			var _wall$patternCol = this.wall[patternCol],
+			    start = _wall$patternCol.start,
+			    end = _wall$patternCol.end;
 			// 取一个随机「行」样式
 
 			var patternRow = Math.random() * (end - start + 1) + start >> 0;
 
 			// 向左扫描「列」
 			for (var col = patternCol; col >= 0; --col) {
-				var colInfo = this.colInfoSet[col];
+				var colInfo = this.wall[col];
 				// 行索引 
 				var rowIndex = patternCol === col ? patternRow : colInfo.start;
 				// 向下扫描「行」
@@ -8421,8 +8421,8 @@ var Model = function () {
 				}
 			}
 			// 向右扫描「列」
-			for (var _col = patternCol, len = this.colInfoSet.length; _col < len; ++_col) {
-				var _colInfo3 = this.colInfoSet[_col];
+			for (var _col = patternCol, len = this.wall.length; _col < len; ++_col) {
+				var _colInfo3 = this.wall[_col];
 				// 行索引 
 				var _rowIndex = patternCol === _col ? patternRow - 1 : _colInfo3.end;
 				// 向上扫描「行」

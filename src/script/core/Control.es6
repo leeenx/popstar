@@ -91,7 +91,7 @@ export default class Constrol {
 		// 清除相邻的同色砖事件
 		this.event.on("view-clean", () => {
 			// 结束压缩数组
-			this.model.compress(); 
+			this.model.tamp(); 
 			// 游戏进入死局 ---- 清空剩余的色砖
 			if(this.model.check() === false) { 
 				this.view.showBountyInfo(this.model.tileCount)

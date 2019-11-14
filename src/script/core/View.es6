@@ -302,24 +302,23 @@ export default class view {
 
 		// 爆星队列
 		this.bombList = []; 
-
 		// 加载图片
 		PIXI.loader
 			.add(
 				[
-					{name: "red", url: "images/red@2x.png"}, 
-					{name: "green", url: "images/green@2x.png"}, 
-					{name: "blue", url: "images/blue@2x.png"}, 
-					{name: "yellow", url: "images/yellow@2x.png"}, 
-					{name: "purple", url: "images/purple@2x.png"}, 
-					{name: "star_red", url: "images/star_red@2x.png"}, 
-					{name: "star_green", url: "images/star_green@2x.png"}, 
-					{name: "star_blue", url: "images/star_blue@2x.png"}, 
-					{name: "star_yellow", url: "images/star_yellow@2x.png"}, 
-					{name: "star_purple", url: "images/star_purple@2x.png"}, 
-					{name: "pause", url: "images/pause@2x.png"}, 
-					{name: "play", url: "images/play@2x.png"}, 
-					{name: "cover", url: "images/cover.jpg"} 
+					{name: "red", url: require("../../images/red@2x.png")}, 
+					{name: "green", url: require("../../images/green@2x.png")}, 
+					{name: "blue", url: require("../../images/blue@2x.png")}, 
+					{name: "yellow", url: require("../../images/yellow@2x.png")}, 
+					{name: "purple", url: require("../../images/purple@2x.png")}, 
+					{name: "star_red", url: require("../../images/star_red@2x.png")}, 
+					{name: "star_green", url: require("../../images/star_green@2x.png")}, 
+					{name: "star_blue", url: require("../../images/star_blue@2x.png")}, 
+					{name: "star_yellow", url: require("../../images/star_yellow@2x.png")}, 
+					{name: "star_purple", url: require("../../images/star_purple@2x.png")}, 
+					{name: "pause", url: require("../../images/pause@2x.png")}, 
+					{name: "play", url: require("../../images/play@2x.png")}, 
+					{name: "cover", url: require("../../images/cover.jpg")} 
 				]
 			)
 			.load(

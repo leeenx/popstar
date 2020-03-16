@@ -22,12 +22,14 @@
     "@babel/polyfill": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
     "babel-loader": "^8.0.6",
+    "babel-polyfill": "^6.26.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.0.5",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
     "image-loader": "0.0.1",
     "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.9.0"
   }
 }

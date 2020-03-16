@@ -4,7 +4,7 @@
 */
 
 // 向前兼容
-import 'babel-polyfill'; 
+import '@babel/polyfill'; 
 
 import Model from './core/Model.es6'; 
 import View from './core/View.es6'; 
